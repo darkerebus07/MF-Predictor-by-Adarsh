@@ -1,0 +1,1170 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#020617">
+  <meta name="description"
+    content="History-analyzed 10-year and 20-year mutual fund portfolio prediction dashboard by Adarsh.">
+  <link rel="icon"
+    href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📈</text></svg>">
+  <title>Adarsh Future Portfolio</title>
+<style>
+    * {
+      box-sizing: border-box
+    }
+
+    :root {
+      --bg: #020617;
+      --card: #0f172a;
+      --soft: #111827;
+      --border: #253047;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+      --track: #263247;
+      --gain: #34d399
+    }
+
+    body.light {
+      --bg: #f8fafc;
+      --card: #fff;
+      --soft: #f1f5f9;
+      --border: #e2e8f0;
+      --text: #0f172a;
+      --muted: #64748b;
+      --track: #e2e8f0;
+      --gain: #047857
+    }
+
+    html {
+      background: var(--bg)
+    }
+
+    body {
+      margin: 0;
+      color: var(--text);
+      font: 14px Arial;
+      background: radial-gradient(circle at 50% 20%, #142c50 0, var(--bg) 65%);
+      min-height: 100vh
+    }
+
+    .shell {
+      width: calc(100% - 32px);
+      max-width: 1120px;
+      margin: auto
+    }
+
+    .header {
+      border-bottom: 1px solid var(--border);
+      background: #020617e8;
+      position: sticky;
+      top: 0;
+      z-index: 4;
+      backdrop-filter: blur(12px)
+    }
+
+    body.light .header {
+      background: #f8fafce8
+    }
+
+    .headerin {
+      height: 68px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between
+    }
+
+    .brand,
+    .actions {
+      display: flex;
+      align-items: center;
+      gap: 10px
+    }
+
+    .logo {
+      width: 38px;
+      height: 38px;
+      display: grid;
+      place-items: center;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #7c3aed, #0891b2);
+      font-weight: 900
+    }
+
+    .brand-title {
+      font-size: 18px;
+      font-weight: 800
+    }
+
+    .muted {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.45
+    }
+
+    button,
+    .back {
+      height: 36px;
+      border: 0;
+      border-radius: 9px;
+      padding: 0 12px;
+      color: #fff;
+      background: #7c3aed;
+      font-weight: 700;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center
+    }
+
+    .theme {
+      width: 38px;
+      padding: 0;
+      justify-content: center;
+      background: var(--card);
+      border: 1px solid var(--border);
+      color: var(--text)
+    }
+
+    main {
+      padding: 22px 0
+    }
+
+    .switch,
+    .tabs {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap
+    }
+
+    .switch {
+      justify-content: center;
+      margin-bottom: 20px
+    }
+
+    .switch button {
+      min-width: 132px;
+      height: 43px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      color: var(--muted)
+    }
+
+    .switch button.active,
+    .tabs button.active {
+      background: linear-gradient(135deg, #7c3aed, #0891b2);
+      color: #fff;
+      border-color: transparent
+    }
+
+    .intro {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 18px
+    }
+
+    .intro h1 {
+      margin: 5px 0;
+      font-size: 26px
+    }
+
+    .tabs button {
+      background: var(--card);
+      border: 1px solid var(--border);
+      color: var(--muted)
+    }
+
+    .notice {
+      margin: 15px 0;
+      padding: 11px 14px;
+      border: 1px solid #b8812d;
+      border-radius: 10px;
+      background: #f59e0b12
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin: 18px 0
+    }
+
+    .card,
+    .panel,
+    .fundbox,
+    .logic {
+      background: #0f172ae8;
+      border: 1px solid var(--border);
+      border-radius: 12px
+    }
+
+    body.light .card,
+    body.light .panel,
+    body.light .fundbox,
+    body.light .logic {
+      background: #fffffff0
+    }
+
+    .card {
+      min-height: 116px;
+      padding: 16px
+    }
+
+    .value {
+      font-size: 22px;
+      font-weight: 800;
+      margin: 12px 0
+    }
+
+    .gain {
+      color: var(--gain) !important;
+      font-weight: 800;
+      text-shadow: 0 0 7px #34d39933
+    }
+
+    body.light .gain {
+      text-shadow: none
+    }
+
+    .charts {
+      display: grid;
+      grid-template-columns: 1.8fr 1fr;
+      gap: 14px
+    }
+
+    .panel {
+      padding: 18px
+    }
+
+    .bar {
+      margin: 15px 0
+    }
+
+    .barhead {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 7px
+    }
+
+    .track {
+      height: 9px;
+      background: var(--track);
+      border-radius: 99px;
+      overflow: hidden
+    }
+
+    .fill {
+      height: 100%;
+      border-radius: 99px
+    }
+
+    .allocation {
+      display: grid;
+      grid-template-columns: 120px 1fr;
+      align-items: center;
+      gap: 14px;
+      margin-top: 14px
+    }
+
+    .donut {
+      width: 112px;
+      height: 112px;
+      border-radius: 50%;
+      position: relative
+    }
+
+    .donut:after {
+      content: "";
+      position: absolute;
+      inset: 25px;
+      border-radius: 50%;
+      background: var(--card)
+    }
+
+    .legend {
+      display: grid;
+      gap: 9px
+    }
+
+    .legend div {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px
+    }
+
+    .fundbox,
+    .logic {
+      margin-top: 15px;
+      overflow: hidden
+    }
+
+    .title {
+      padding: 14px;
+      border-bottom: 1px solid var(--border)
+    }
+
+    .scroll {
+      overflow-x: auto
+    }
+
+    .gridrow {
+      min-width: 900px;
+      display: grid;
+      grid-template-columns: 2.2fr repeat(5, 1fr);
+      gap: 8px;
+      padding: 13px 14px;
+      border-bottom: 1px solid var(--border);
+      align-items: center
+    }
+
+    .head {
+      background: var(--soft);
+      color: var(--muted);
+      font-size: 12px
+    }
+
+    .logic {
+      padding: 17px;
+      overflow: visible
+    }
+
+    .miniwrap {
+      margin-top: 12px;
+      overflow-x: auto;
+      border: 1px solid var(--border);
+      border-radius: 10px
+    }
+
+    .mini {
+      width: 100%;
+      min-width: 720px;
+      border-collapse: collapse;
+      background: var(--card)
+    }
+
+    .mini th,
+    .mini td {
+      padding: 10px;
+      border-right: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      text-align: left;
+      vertical-align: top;
+      font-size: 12px;
+      line-height: 1.45
+    }
+
+    .mini th {
+      background: var(--soft);
+      color: var(--muted);
+      font-size: 11px;
+      text-transform: uppercase
+    }
+
+    .mini th:last-child,
+    .mini td:last-child {
+      border-right: 0
+    }
+
+    .mini tr:last-child td {
+      border-bottom: 0
+    }
+
+    .mini td:first-child {
+      font-weight: 800;
+      white-space: nowrap
+    }
+
+    .rate {
+      color: #67e8f9;
+      font-weight: 800
+    }
+
+    body.light .rate {
+      color: #075985
+    }
+
+    .scenario {
+      margin-top: 15px
+    }
+
+    .footer {
+      text-align: center;
+      color: var(--muted);
+      padding: 5px 0 22px
+    }
+
+    .heart {
+      color: #ef4444
+    }
+
+    @media(max-width:820px) {
+      .intro {
+        display: block
+      }
+
+      .tabs {
+        margin-top: 12px
+      }
+
+      .stats {
+        grid-template-columns: repeat(2, 1fr)
+      }
+
+      .charts {
+        grid-template-columns: 1fr
+      }
+    }
+
+    @media(max-width:430px) {
+      .shell {
+        width: calc(100% - 20px)
+      }
+
+      .brand .muted {
+        display: none
+      }
+
+      .brand-title {
+        font-size: 14px
+      }
+
+      .stats {
+        grid-template-columns: 1fr 1fr
+      }
+
+      .value {
+        font-size: 17px
+      }
+
+      .switch button {
+        min-width: 112px
+      }
+    }
+
+    .note-warning {
+      margin: 15px 0;
+      padding: 13px 15px;
+      border: 1px solid #ef4444;
+      border-left: 5px solid #ef4444;
+      border-radius: 10px;
+      background: rgba(127, 29, 29, .28);
+      color: #fecaca;
+      box-shadow: 0 6px 20px rgba(239, 68, 68, .10);
+      line-height: 1.5
+    }
+
+    .note-warning strong {
+      color: #fff
+    }
+
+    .note-label {
+      display: inline-block;
+      margin-right: 6px;
+      color: #fff;
+      background: #b91c1c;
+      border-radius: 5px;
+      padding: 2px 7px;
+      font-size: 11px;
+      letter-spacing: .3px
+    }
+
+    body.light .note-warning {
+      background: #fef2f2;
+      color: #7f1d1d;
+      border-color: #dc2626
+    }
+
+    body.light .note-warning strong {
+      color: #7f1d1d
+    }
+
+    .switch button,
+    .tabs button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      line-height: 1.15
+    }
+
+    .na {
+      color: var(--muted)
+    }
+
+    .required-star {
+      color: #ef4444;
+      font-weight: 900;
+      margin-right: 3px
+    }
+
+    .logic-date {
+      margin-top: 5px;
+      color: #67e8f9;
+      font-size: 12px;
+      font-weight: 700
+    }
+
+    body.light .logic-date {
+      color: #075985
+    }
+
+    .panel-title-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px
+    }
+
+    .chart-toggle {
+      height: 30px;
+      min-width: 58px;
+      padding: 0 10px;
+      background: #0891b2;
+      font-size: 11px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      line-height: 1
+    }
+
+    .allocation-bars {
+      display: none;
+      margin-top: 16px
+    }
+
+    .allocation-bars.show {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-around;
+      gap: 10px;
+      min-height: 190px;
+      padding: 12px 4px 0
+    }
+
+    .allocation-bar-item {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-end;
+      height: 176px
+    }
+
+    .allocation-bar-value {
+      margin-bottom: 6px;
+      font-size: 11px;
+      font-weight: 800;
+      color: var(--text)
+    }
+
+    .allocation-bar-track {
+      width: min(42px, 75%);
+      height: 125px;
+      background: var(--track);
+      border-radius: 9px 9px 4px 4px;
+      overflow: hidden;
+      display: flex;
+      align-items: flex-end
+    }
+
+    .allocation-bar-fill {
+      width: 100%;
+      border-radius: 8px 8px 3px 3px;
+      transition: height .35s
+    }
+
+    .allocation-bar-label {
+      width: 100%;
+      height: 24px;
+      margin-top: 7px;
+      color: var(--muted);
+      font-size: 9px;
+      line-height: 1.15;
+      text-align: center;
+      overflow-wrap: anywhere;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center
+    }
+
+    .allocation.hide {
+      display: none
+    }
+
+    /* GitHub Pages and mobile compatibility enhancements. */
+    html {
+      -webkit-text-size-adjust: 100%;
+      text-size-adjust: 100%;
+      scroll-behavior: smooth
+    }
+
+    body {
+      overflow-x: hidden
+    }
+
+    button,
+    .back {
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation
+    }
+
+    img,
+    svg,
+    canvas {
+      max-width: 100%
+    }
+
+    .scroll,
+    .miniwrap {
+      overscroll-behavior-inline: contain;
+      -webkit-overflow-scrolling: touch
+    }
+
+    @media(max-width:760px) {
+      .shell {
+        width: calc(100% - 20px)
+      }
+
+      .headerin {
+        height: auto;
+        min-height: 72px;
+        padding: 10px 0;
+        gap: 10px;
+        align-items: flex-start
+      }
+
+      .brand {
+        min-width: 0;
+        flex: 1
+      }
+
+      .brand>div:last-child {
+        min-width: 0
+      }
+
+      .brand-title {
+        font-size: 15px;
+        line-height: 1.2;
+        white-space: normal
+      }
+
+      .brand .muted {
+        font-size: 10px;
+        line-height: 1.3
+      }
+
+      .actions {
+        flex: 0 0 auto;
+        gap: 6px
+      }
+
+      .back {
+        height: 34px;
+        padding: 0 10px;
+        font-size: 11px
+      }
+
+      .theme {
+        height: 34px;
+        width: 36px
+      }
+
+      main {
+        padding: 16px 0 22px
+      }
+
+      .switch {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+        margin-bottom: 16px
+      }
+
+      .switch button {
+        width: 100%;
+        min-width: 0;
+        height: 42px;
+        padding: 0 8px;
+        font-size: 12px
+      }
+
+      .intro {
+        display: block
+      }
+
+      .intro h1 {
+        font-size: 22px;
+        line-height: 1.2
+      }
+
+      .tabs {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 7px;
+        margin-top: 12px
+      }
+
+      .tabs button {
+        width: 100%;
+        height: 40px;
+        padding: 0 7px;
+        font-size: 10px;
+        line-height: 1.15
+      }
+
+      .tabs button:last-child {
+        grid-column: 1 / -1
+      }
+
+      .note-warning {
+        padding: 12px;
+        font-size: 12px
+      }
+
+      .note-label {
+        display: block;
+        width: max-content;
+        margin: 0 0 7px
+      }
+
+      .stats {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 9px;
+        margin: 14px 0
+      }
+
+      .card {
+        min-height: 108px;
+        padding: 13px
+      }
+
+      .value {
+        font-size: 18px;
+        overflow-wrap: anywhere
+      }
+
+      .card .muted {
+        font-size: 10px
+      }
+
+      .charts {
+        grid-template-columns: 1fr;
+        gap: 10px
+      }
+
+      .panel {
+        padding: 14px;
+        min-width: 0
+      }
+
+      .panel-title-row {
+        align-items: flex-start
+      }
+
+      .chart-toggle {
+        flex: 0 0 auto
+      }
+
+      .allocation {
+        grid-template-columns: 100px minmax(0, 1fr);
+        gap: 10px
+      }
+
+      .donut {
+        width: 94px;
+        height: 94px
+      }
+
+      .donut:after {
+        inset: 21px
+      }
+
+      .legend div {
+        font-size: 10px;
+        gap: 7px
+      }
+
+      .fundbox,
+      .logic,
+      .scenario {
+        margin-top: 12px
+      }
+
+      .title,
+      .logic {
+        padding: 13px
+      }
+
+      .gridrow {
+        min-width: 820px;
+        padding: 11px 12px;
+        font-size: 11px
+      }
+
+      .mini {
+        min-width: 690px
+      }
+
+      .mini th,
+      .mini td {
+        padding: 9px;
+        font-size: 10px
+      }
+
+      .logic-date {
+        font-size: 11px
+      }
+
+      .allocation-bars.show {
+        gap: 6px;
+        min-height: 175px
+      }
+
+      .allocation-bar-item {
+        height: 162px
+      }
+
+      .allocation-bar-track {
+        height: 112px;
+        width: min(34px, 72%)
+      }
+
+      .allocation-bar-label {
+        height: 22px;
+        font-size: 8px
+      }
+    }
+
+    @media(max-width:420px) {
+      .logo {
+        width: 34px;
+        height: 34px;
+        font-size: 12px
+      }
+
+      .brand-title {
+        font-size: 13px
+      }
+
+      .brand .muted {
+        display: none
+      }
+
+      .stats {
+        grid-template-columns: 1fr 1fr
+      }
+
+      .card {
+        min-height: 103px;
+        padding: 11px
+      }
+
+      .value {
+        font-size: 16px
+      }
+
+      .switch button {
+        font-size: 11px
+      }
+
+      .tabs button {
+        font-size: 9px
+      }
+
+      .allocation {
+        grid-template-columns: 88px minmax(0, 1fr)
+      }
+
+      .donut {
+        width: 82px;
+        height: 82px
+      }
+
+      .donut:after {
+        inset: 18px
+      }
+    }
+
+    @media(max-width:330px) {
+      .stats {
+        grid-template-columns: 1fr
+      }
+
+      .actions {
+        gap: 4px
+      }
+
+      .back {
+        padding: 0 8px
+      }
+    }
+
+    .allocation-panel {
+      min-height: 260px
+    }
+
+    .allocation-panel .allocation {
+      min-height: 205px;
+      margin-top: 8px;
+      grid-template-columns: 170px minmax(0, 1fr);
+      align-items: center;
+      align-content: center;
+      justify-content: center;
+      gap: 20px
+    }
+
+    .allocation-panel .donut {
+      width: 160px;
+      height: 160px;
+      margin: auto
+    }
+
+    .allocation-panel .donut:after {
+      inset: 35px
+    }
+
+    .allocation-panel .legend {
+      align-self: center;
+      gap: 13px
+    }
+
+    .allocation-panel .legend div {
+      font-size: 12px;
+      gap: 10px
+    }
+
+    @media(max-width:820px) {
+      .allocation-panel {
+        min-height: 250px
+      }
+
+      .allocation-panel .allocation {
+        min-height: 195px;
+        grid-template-columns: 145px minmax(0, 1fr);
+        gap: 15px
+      }
+
+      .allocation-panel .donut {
+        width: 138px;
+        height: 138px
+      }
+
+      .allocation-panel .donut:after {
+        inset: 30px
+      }
+    }
+
+    @media(max-width:420px) {
+      .allocation-panel {
+        min-height: 242px
+      }
+
+      .allocation-panel .allocation {
+        min-height: 185px;
+        grid-template-columns: 118px minmax(0, 1fr);
+        gap: 10px
+      }
+
+      .allocation-panel .donut {
+        width: 112px;
+        height: 112px
+      }
+
+      .allocation-panel .donut:after {
+        inset: 24px
+      }
+
+      .allocation-panel .legend {
+        gap: 10px
+      }
+
+      .allocation-panel .legend div {
+        font-size: 9px
+      }
+    }
+
+    /* Slightly larger scenario explanation text and numeric values only. */
+    .scenario .mini td {
+      font-size: 13px;
+      line-height: 1.55;
+    }
+
+    .scenario .mini td:nth-child(2) {
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    @media(max-width:760px) {
+
+      .scenario .mini td,
+      .scenario .mini td:nth-child(2) {
+        font-size: 12px;
+        line-height: 1.5;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header class="header">
+    <div class="shell headerin">
+      <div class="brand">
+        <div class="logo">AM</div>
+        <div>
+          <div class="brand-title">Adarsh Future Portfolio</div>
+          <div class="muted">History-analyzed 10/20-year prediction</div>
+        </div>
+      </div>
+      <div class="actions"><a class="back" href="">Back</a><button class="theme" id="theme"
+          onclick="toggleTheme()">☀</button></div>
+    </div>
+  </header>
+  <main class="shell">
+    <div class="switch"><button id="y10" class="active" onclick="setYears(10)">10-Year View</button><button id="y20"
+        onclick="setYears(20)">20-Year View</button></div>
+    <div class="intro">
+      <div>
+        <div class="muted">FORECAST DASHBOARD</div>
+        <h1 id="heading">Future portfolio after 10 years</h1>
+        <div class="muted">₹5,000 monthly SIP across four funds</div>
+      </div>
+      <div class="tabs"><button id="conservative" onclick="setScenario('conservative')">Conservative</button><button
+          id="base" class="active" onclick="setScenario('base')">Planning / Base</button><button id="recent"
+          onclick="setScenario('recent')">Recent run-rate</button></div>
+    </div>
+    <div class="note-warning" role="note"><strong>Planning estimate only:</strong> Fund history is analyzed through 29
+      Sep 2026. Past performance does not guarantee future results, particularly for newer and volatile small-cap and
+      silver funds.</div>
+    <section id="stats" class="stats"></section>
+    <section class="charts">
+      <div class="panel"><b>Projected fund values</b>
+        <div id="date" class="muted"></div>
+        <div id="bars"></div>
+      </div>
+      <div class="panel allocation-panel" id="allocationPanel">
+        <div class="panel-title-row"><b>Projected value allocation</b><button class="chart-toggle" id="chartToggle"
+            onclick="toggleAllocationChart()" title="Switch between pie and bar chart">Bar</button></div>
+        <div class="allocation" id="allocationPie">
+          <div id="donut" class="donut"></div>
+          <div id="legend" class="legend"></div>
+        </div>
+        <div class="allocation-bars" id="allocationBars"></div>
+      </div>
+    </section>
+    <section class="fundbox">
+      <div class="title"><b>Projected tracked mutual funds</b>
+        <div class="muted">Future NAV and units are not fabricated. Values use monthly SIP compounding.</div>
+      </div>
+      <div class="scroll">
+        <div class="gridrow head"><span>Fund</span><span>Monthly SIP</span><span>Invested</span><span>Assumed
+            return</span><span>Projected value</span><span>Projected gain</span></div>
+        <div id="rows"></div>
+      </div>
+    </section>
+    <section class="logic"><b>Historical-performance logic</b>
+      <div class="logic-date">As of current date: 30 Sep 2026</div>
+      <p class="muted">Planning/Base gives greater weight to longer available performance periods. Conservative reduces
+        history-based rates for a safety margin and caps silver at 12%. Recent run-rate extends the latest four-year
+        return where available and is an optimistic comparison.</p>
+      <div class="miniwrap">
+        <table class="mini">
+          <thead>
+            <tr>
+              <th>Fund</th>
+              <th>3-year</th>
+              <th>4-year</th>
+              <th>5-year</th>
+              <th>10-year</th>
+              <th>Calculated base</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Tata Arbitrage</td>
+              <td>7.46%</td>
+              <td>7.52%</td>
+              <td>6.86%</td>
+              <td class="na"><span class="required-star">*</span>Not available</td>
+              <td class="rate">7.14%</td>
+            </tr>
+            <tr>
+              <td>Nippon Large Cap</td>
+              <td>9.89%</td>
+              <td>13.70%</td>
+              <td>12.04%</td>
+              <td>13.80%</td>
+              <td class="rate">12.49%</td>
+            </tr>
+            <tr>
+              <td>Bandhan Small Cap</td>
+              <td>23.38%</td>
+              <td>25.98%</td>
+              <td>19.51%</td>
+              <td class="na"><span class="required-star">*</span>Not available</td>
+              <td class="rate">21.64%</td>
+            </tr>
+            <tr>
+              <td>ICICI Silver FoF</td>
+              <td>43.56%</td>
+              <td>39.30%</td>
+              <td class="na"><span class="required-star">*</span>Not available</td>
+              <td class="na"><span class="required-star">*</span>Not available</td>
+              <td class="rate">41.86%</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="muted" style="margin-top:8px"><span class="required-star">*</span> Historical return is not available
+        for that period because the fund does not yet have enough completed performance history.</div>
+    </section>
+    <section class="scenario miniwrap">
+      <table class="mini">
+        <thead>
+          <tr>
+            <th>Scenario</th>
+            <th>Rates used</th>
+            <th>What it means</th>
+            <th>Best used for</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Conservative</td>
+            <td>6.43%, 9.37%, 14.07%, 12.00%</td>
+            <td>Historical rates are reduced to allow for weaker markets and volatility.</td>
+            <td>Cautious, downside-aware planning.</td>
+          </tr>
+          <tr>
+            <td>Planning / Base</td>
+            <td>7.14%, 12.49%, 21.64%, 41.86%</td>
+            <td>Available history is blended, with extra weight on longer periods.</td>
+            <td>Central history-based estimate, not a guarantee.</td>
+          </tr>
+          <tr>
+            <td>Recent run-rate</td>
+            <td>7.52%, 13.70%, 25.98%, 39.30%</td>
+            <td>Latest four-year annualized performance is extended into the future.</td>
+            <td>Optimistic mathematical comparison only.</td>
+          </tr>
+          <tr>
+            <td>Date convention</td>
+            <td>History cutoff: 29 Sep 2026</td>
+            <td>10-year gain ends 30 Sep 2036; 20-year gain ends 30 Sep 2046.</td>
+            <td>Explaining the fixed date below projected gains.</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+  </main>
+  <footer class="footer">Made by Adarsh <span class="heart">♥</span></footer>
+  <script>
+    const heading = document.getElementById('heading'), date = document.getElementById('date'), stats = document.getElementById('stats'), bars = document.getElementById('bars'), donut = document.getElementById('donut'), legend = document.getElementById('legend'), rows = document.getElementById('rows'), allocationBars = document.getElementById('allocationBars'), allocationPie = document.getElementById('allocationPie'), chartToggle = document.getElementById('chartToggle'), allocationPanel = document.getElementById('allocationPanel'), theme = document.getElementById('theme'), y10 = document.getElementById('y10'), y20 = document.getElementById('y20'); const F = [["Tata Arbitrage", 2000, "#7c3aed"], ["Nippon Large Cap", 1000, "#0891b2"], ["Bandhan Small Cap", 1000, "#f59e0b"], ["ICICI Silver FoF", 1000, "#64748b"]], P = { "10": { "conservative": { "rates": [6.43, 9.37, 14.07, 12.0], "values": [333936, 194856, 250228, 224036] }, "base": { "rates": [7.14, 12.49, 21.64, 41.86], "values": [346569, 229965, 376228, 1114481] }, "recent": { "rates": [7.52, 13.7, 25.98, 39.3], "values": [353542, 245322, 475798, 973119] } }, "20": { "conservative": { "rates": [6.43, 9.37, 14.07, 12.0], "values": [956672, 672049, 1183592, 919857] }, "base": { "rates": [7.14, 12.49, 21.64, 41.86], "values": [1037296, 976071, 3044407, 37899607] }, "recent": { "rates": [7.52, 13.7, 25.98, 39.3], "values": [1083560, 1131131, 5266935, 27744878] } } }; let years = 10, scenario = 'base', allocationMode = 'pie'; const money = n => new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(n); function setYears(y) { years = y; y10.classList.toggle('active', y === 10); y20.classList.toggle('active', y === 20); render() } function setScenario(s) { scenario = s; document.querySelectorAll('.tabs button').forEach(x => x.classList.remove('active')); document.getElementById(s).classList.add('active'); render() } function render() { const m = years * 12, d = P[String(years)][scenario], total = d.values.reduce((a, b) => a + b, 0), invested = 5000 * m, gain = total - invested, max = Math.max(...d.values), end = years === 10 ? '30 Sep 2036' : '30 Sep 2046'; heading.textContent = `Future portfolio after ${years} years`; date.textContent = `Estimated through ${end} using history through 29 Sep 2026`; stats.innerHTML = [['Total invested', money(invested), `${money(5000)} × ${m} months`], ['Projected value', money(total), 'Estimated corpus'], ['Projected gain', money(gain), `Estimated through ${end}<br>History through 29 Sep 2026`], ['Monthly SIP', money(5000), 'Across four funds']].map((x, i) => `<div class="card"><div class="muted">${x[0]}</div><div class="value ${i === 2 ? 'gain' : ''}">${x[1]}</div><div class="muted">${x[2]}</div></div>`).join(''); bars.innerHTML = F.map((f, i) => `<div class="bar"><div class="barhead"><b>${f[0]}</b><span>${money(d.values[i])}</span></div><div class="track"><div class="fill" style="width:${d.values[i] / max * 100}%;background:${f[2]}"></div></div></div>`).join(''); let p = 0; donut.style.background = `conic-gradient(${F.map((f, i) => { let z = p; p += d.values[i] / total * 100; return `${f[2]} ${z}% ${p}%` }).join(',')})`; legend.innerHTML = F.map((f, i) => `<div><span>${f[0]}</span><b>${(d.values[i] / total * 100).toFixed(1)}%</b></div>`).join(''); const allocationPercentages = F.map((f, i) => d.values[i] / total * 100), maxAllocation = Math.max(...allocationPercentages); allocationBars.innerHTML = F.map((f, i) => { const pct = allocationPercentages[i], height = Math.max(6, pct / maxAllocation * 100); return `<div class="allocation-bar-item"><div class="allocation-bar-value">${pct.toFixed(1)}%</div><div class="allocation-bar-track"><div class="allocation-bar-fill" style="height:${height}%;background:${f[2]}"></div></div><div class="allocation-bar-label">${f[0]}</div></div>` }).join(''); rows.innerHTML = F.map((f, i) => { let inv = f[1] * m; return `<div class="gridrow"><b>${f[0]}</b><span>${money(f[1])}</span><span>${money(inv)}</span><span>${d.rates[i].toFixed(2)}%</span><b>${money(d.values[i])}</b><b class="gain">+${money(d.values[i] - inv)}</b></div>` }).join('') } function toggleAllocationChart() { allocationMode = allocationMode === 'pie' ? 'bar' : 'pie'; allocationPie.classList.toggle('hide', allocationMode === 'bar'); allocationBars.classList.toggle('show', allocationMode === 'bar'); chartToggle.textContent = allocationMode === 'pie' ? 'Bar' : 'Pie'; chartToggle.title = allocationMode === 'pie' ? 'Switch to bar chart' : 'Switch to pie chart' } function toggleTheme() { document.body.classList.toggle('light'); theme.textContent = document.body.classList.contains('light') ? '☾' : '☀' } render();
+  </script>
+</body>
+
+</html>
+
